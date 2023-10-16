@@ -114,7 +114,7 @@ def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
             if isinstance(cve_data["EPSS"], (float, int)):
                 message += "%"
             message += "\n"
-    
+
     if cve_data.get('ExploitDB_ID') is not None:
         #message = "😈  *Public Exploits* (_limit 10_):\n" + "\n".join(public_expls[:20])
         message += f"😈  *Exploit-DB*: <https://www.exploit-db.com/exploits/{cve_data['ExploitDB_ID']}|EDB {cve_data['ExploitDB_ID']} Link>\n"
@@ -124,16 +124,16 @@ def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
     message += f"📅  *Published*: {convert_string_to_datetime(cve_data['Published']):%Y-%m-%d}"
     # message += f" - *Modified*: {datetime.datetime.strptime(cve_data['Last_Modified'], friendly_time)}\n"
     message += f" - *Modified*: {convert_string_to_datetime(cve_data['Last_Modified']):%Y-%m-%d}\n"
-    
-    message += "📓  *Description*: " 
+
+    message += "📓  *Description*: "
     message += cve_data["Description"] if len(cve_data["Description"]) < 500 else cve_data["Description"][:500] + "..."
     message += "\n"
-    
+
     if cve_data.get("Exploit_References"):
         message += f"🔓  *Exploit References* (_limit 5_):\n" + "\n".join(cve_data["Exploit_References"][:5])
-    
+
     if github_addendum:
-        message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']}{github_addendum}|GitHub Dork Link>\n"
+        message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']} {github_addendum}|GitHub Dork Link>\n"
     else:
         message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']}|GitHub CVE Search Link>\n"
 
@@ -173,13 +173,13 @@ def send_slack_mesage(message: str):
     if not slack_url:
         #print("SLACK_WEBHOOK wasn't configured in the secrets!")
         return
-    
+
     json_params = {
         "blocks": [
             {
                 "type": "section",
                 "text": {
-                    "type": "mrkdwn", 
+                    "type": "mrkdwn",
                     "text": message
                 }
             },
@@ -193,7 +193,7 @@ def send_slack_mesage(message: str):
     #     json_params["blocks"].append({
     #             "type": "section",
     #             "text": {
-    #                 "type": "mrkdwn", 
+    #                 "type": "mrkdwn",
     #                 "text": public_expls_msg
     #             }
     #     })
@@ -207,16 +207,16 @@ def send_telegram_message(message: str, public_expls_msg: str):
     ''' Send a message to the telegram group '''
 
     telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-    telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')    
+    telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
 
     if not telegram_bot_token:
         print("TELEGRAM_BOT_TOKEN wasn't configured in the secrets!")
         return
-    
+
     if not telegram_chat_id:
         print("TELEGRAM_CHAT_ID wasn't configured in the secrets!")
         return
-    
+
     if public_expls_msg:
         message = message + "\n" + public_expls_msg
 
@@ -242,7 +242,7 @@ def send_discord_message(message: str, public_expls_msg: str):
     if not discord_webhook_url:
         print("DISCORD_WEBHOOK_URL wasn't configured in the secrets!")
         return
-    
+
     if public_expls_msg:
         message = message + "\n" + public_expls_msg
 
@@ -251,7 +251,7 @@ def send_discord_message(message: str, public_expls_msg: str):
     webhook = SyncWebhook.from_url(discord_webhook_url)
     if public_expls_msg:
         message = message + "\n" + public_expls_msg
-    
+
     #webhook.send(message)
     webhook.send(content=message)
     return
