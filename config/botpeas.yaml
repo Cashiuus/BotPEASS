@@ -117,3 +117,5 @@ GITDORK_REPO_EXCLUSIONS:
 - sthagen/CVEProject-cvelist
 - trickest/cve
 - Patrowl/PatrowlHearsData
+- aquasecurity/vuln-list-nvd
+- bitfront-se/vuln-list-temp
