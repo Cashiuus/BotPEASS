@@ -76,21 +76,25 @@ def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
     # where the config is parsed.
     # Refactor all this once I move code around in this project
     gopher_epss = EPSSGopher()
-    epss_percentage = None
-    epss = gopher_epss.get_score_for_cve(cve_data["CVE_ID"])
-    if epss:
+    epss_string = ""
+    epss_score = None
+    epss_score, epss_percentile = gopher_epss.get_score_tuple_for_cve(cve_data["CVE_ID"])
+    if epss_score:
         # log.debug(f"{row_data['CVE']} has EPSS: {float(epss):.2f}")
         # log.debug(f"{row_data['CVE']} has EPSS: {epss}")
-        epss_percentage = float(epss) * 100
-        print(f"[*] {cve_data['CVE_ID']} has EPSS: {float(epss):.2f} ({epss_percentage}%)")
-        if round(epss_percentage) == 0:
-            print("[DBG] EPSS for this CVE is rounded to 0%")
-        # cve_data["EPSS"] = f"{epss_percentage:.0f}%"
-        cve_data["EPSS"] = epss_percentage
+        epss_score = round(float(epss_score), 2)
+        epss_percentile = round(float(epss_percentile) * 100, 0)
+        print(f"[*] {cve_data['CVE_ID']} has EPSS: {float(epss_score):.2f} - Percentile: {epss_percentile:.2f}ᵀᴴ)")
+        # if round(epss_score) == 0:
+        #     print("[DBG] EPSS for this CVE is rounded to 0%")
+        # cve_data["EPSS"] = f"{epss_score:.0f}%"
+        # -- Format the EPSS String for the message --
+        epss_string = f"*EPSS:* {epss_score} / {epss_percentile}ᵀᴴ"
+        cve_data["EPSS"] = epss_string
     else:
-        # EPSS doesn't exist for this CVE yet, setting to NA for messages
-        epss = "NA"
-        cve_data["EPSS"] = epss
+        # EPSS doesn't exist for this CVE yet, setting to NA or blank for messages
+        # epss_string = "NA"
+        cve_data["EPSS"] = epss_string
 
     # Emoji's we can use: https://www.freecodecamp.org/news/all-emojis-emoji-list-for-copy-and-paste/
     # 💥 📅
@@ -100,20 +104,16 @@ def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
         # All of this is on one line, but broken up for readability here
         message = f"🚨  *<{CVE_URL}/{cve_data['CVE_ID']}/|{cve_data['CVE_ID']}>*"
         message += f"  CVSS: {cve_data['CVSSv3_Score']}"
-        message += f"  EPSS: {cve_data['EPSS']}"
-        # Only add "%" if EPSS is a score, otherwise it'll be "NA" and don't need "%"
-        if isinstance(cve_data["EPSS"], (float, int)):
-            message += "%"
-        message += "\n"
+        if cve_data.get("EPSS"):
+            message += f"  {cve_data['EPSS']}\n"
+        else:
+            message += "\n"
     else:
         # -- Original message breakdown --
         message = f"🚨  *{cve_data['CVE_ID']}*  🚨\n"
         message += f"*CVSSv3.1*: {cve_data['CVSSv3_Score']}\n"
         if cve_data.get("EPSS") is not None:
-            message += f"*EPSS*: {cve_data['EPSS']}"
-            if isinstance(cve_data["EPSS"], (float, int)):
-                message += "%"
-            message += "\n"
+            message += f"  {cve_data['EPSS']}\n"
 
     if cve_data.get('ExploitDB_ID') is not None:
         #message = "😈  *Public Exploits* (_limit 10_):\n" + "\n".join(public_expls[:20])
