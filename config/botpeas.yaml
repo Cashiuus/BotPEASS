@@ -119,3 +119,6 @@ GITDORK_REPO_EXCLUSIONS:
 - Patrowl/PatrowlHearsData
 - aquasecurity/vuln-list-nvd
 - bitfront-se/vuln-list-temp
+- justakazh/CVE_Database
+- khulnasoft-lab/vuln-list-nvd
+- adminlove520/treat_v1.0.2
