@@ -64,7 +64,7 @@ def convert_string_to_datetime(raw_string):
 #################### GENERATE MESSAGES #########################
 def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
     """
-    Generate new CVE message for sending to slack
+    Generate new CVE message for sending to Slack as a notification.
     """
     # friendly_time = "%Y-%m-%d"
 
@@ -126,7 +126,7 @@ def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
     message += f" - *Modified*: {convert_string_to_datetime(cve_data['Last_Modified']):%Y-%m-%d}\n"
 
     message += "📓  *Description*: "
-    message += cve_data["Description"] if len(cve_data["Description"]) < 500 else cve_data["Description"][:500] + "..."
+    message += cve_data["Description"] if len(cve_data["Description"]) < 400 else cve_data["Description"][:400] + "..."
     message += "\n"
 
     if cve_data.get("Exploit_References"):
