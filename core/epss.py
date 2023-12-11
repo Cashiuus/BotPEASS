@@ -363,6 +363,45 @@ class EPSSGopher(object):
         print(f"[*] Total CVE entries in dataset: {len(dataset):,d}")
         return dataset
 
+    # Offline CSV dataset querying for EPSS Scores
+    # -------------------------------------------------------------
+    def offline_download_epss_csv(self):
+        """
+        OFFLINE METHOD
+        Fetch the EPSS CSV dataset file.
+        """
+        url = "https://epss.cyentia.com/epss_scores-current.csv.gz"
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f"[!] Error fetching EPSS CSV dataset, bad response code: {response.status_code}")
+            return
+        with open('epss_scores.csv', 'wb') as f:
+            f.write(response.content)
+            print("[*] EPSS CSV file downloaded")
+        return
+
+
+    def offline_get_epss_score(self, cve_id):
+        """
+        OFFLINE METHOD
+        Get EPSS score by querying CSV score sheet
+        """
+        if not os.path.isfile('epss_scores.csv'):
+            self.offline_download_epss_csv()
+            if not os.path.isfile('epss_scores.csv'):
+                print("[!] EPSS csv file doesn't exist, something went wrong with saving file")
+                return
+
+        with open('epss_scores.csv', 'r') as f:
+            first_row_skipped = False
+            for line in f:
+                if not first_row_skipped:
+                    first_row_skipped = True
+                    continue
+                row_values = line.strip().split(',')
+                if row_values[0] ==  cve_id:
+                    # return float(row_values[1]) * 100
+                    return row_values[1]
 
 # -+- End of Class -+-
 
