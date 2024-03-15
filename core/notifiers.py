@@ -62,7 +62,7 @@ def convert_string_to_datetime(raw_string):
 
 
 #################### GENERATE MESSAGES #########################
-def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
+def generate_new_cve_message(cve_data: dict, github_addendum: str = None, github_poc_count: int = None) -> str:
     """
     Generate new CVE message for sending to Slack as a notification.
     """
@@ -133,9 +133,13 @@ def generate_new_cve_message(cve_data: dict, github_addendum=None) -> str:
         message += f"🔓  *Exploit References* (_limit 5_):\n" + "\n".join(cve_data["Exploit_References"][:5])
 
     if github_addendum:
-        message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']} {github_addendum}|GitHub Dork Link>\n"
+        message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']}{github_addendum}|GitHub Dork Link>"
     else:
-        message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']}|GitHub CVE Search Link>\n"
+        message += f"🔗  *GitHub Dork:* <https://github.com/search?q={cve_data['CVE_ID']}&type=repositories|GitHub Dork Link>"
+    if github_poc_count:
+        message += f"  :fire:  POC's: {github_poc_count})\n"
+    else:
+        message += "\n"
 
     message += "ℹ️   *More information* (_limit 5_):\n" + "\n".join(cve_data["Normal_References"][:5])
 

@@ -8,26 +8,9 @@ import requests
 from core.epss import EPSSGopher
 from core.notifiers import generate_new_cve_message, send_slack_mesage, send_telegram_message
 from core.providers import CVERetrieverNVD
+from core.github import search_github
 
 DEBUG = False
-
-
-# def enrich_with_epss(dataset):
-#     """
-#     From provided dataset of new CVE's pulled down from NVD, see if each has an EPSS score
-#     and add it as a key to the dataset.
-    
-#     dataset:
-
-#     """
-#     gopher = EPSSGopher()
-
-#     for id,record in enumerate(dataset):
-
-
-
-#     return dataset
-
 
 
 
@@ -45,18 +28,23 @@ def main():
         for item in data:
             # item is dict with keys: CVE_ID, CVSSv3_Score, Published, Description, ExploitDB_ID
             #  Exploit_References, Normal_References
-            public_exploits = ''
-            cve_message = generate_new_cve_message(item, github_addendum=github_query_addendum)
+
+            github_poc_count = search_github(item['CVE_ID'])
+            if github_poc_count:
+                github_poc_count = len(github_poc_count)
+
+            cve_message = generate_new_cve_message(item, github_addendum=github_query_addendum, github_poc_count=github_poc_count)
+            # public_exploits = ''
             if item.get('ExploitDB_ID') is not None:
                 print(f"\n[*] CVE *with Exploit-db ID* Message:\n{cve_message}")
             else:
                 print(f"\n[*] CVE Message:\n{cve_message}")
             send_slack_mesage(cve_message)
-        
+
         print(f"[*] {len(data):,d} new CVE's to report this collection cycle")
     else:
         print("[-] No new CVE's matching your search scope for this collection cycle")
-    
+
     #if retriever.cve_new_dataset:
         #print("[*] Can also leverage this class attribute of the dataset. Pulled {} CVE's".format(len(retriever.cve_new_dataset)))
         #pass

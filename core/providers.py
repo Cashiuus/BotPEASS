@@ -120,10 +120,10 @@ class CVERetrieverNVD(object):
             self.excluded_keywords = keywords_config["EXCLUDED_KEYWORDS"]
 
             # NOTE: %3A is the url-encoded form of a colon ":"
-            self.gitdork_excluded_repos_string = "NOT is:fork +-repo:"
-            self.gitdork_excluded_repos_string += "+-repo:".join([x for x in keywords_config["GITDORK_REPO_EXCLUSIONS"]])
             # Must also add it to the front because join() doesn't do the very front
-            # self.gitdork_excluded_repos_string = f"+-repo:{self.gitdork_excluded_repos_string}"
+            self.gitdork_excluded_repos_string = "+-repo:"
+            self.gitdork_excluded_repos_string += "+-repo:".join([x for x in keywords_config["GITDORK_REPO_EXCLUSIONS"]])
+            self.gitdork_excluded_repos_string += "+NOT is:fork"
 
         print("[*] Loaded config settings, search & exclusion keywords")
 
