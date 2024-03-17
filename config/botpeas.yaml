@@ -12,7 +12,8 @@ SEARCH_SCOPE: all_keywords
 
 # -- Include High-Severity CVE's Always --
 # Expand your search scope to also include high-severity CVE's
-# NOTE: Out of caution, if enabled, bot will also include all CVE's for which no score exists yet, so we don't miss a hot new CVE that just doesn't yet have a score assigned.
+# NOTE: Out of caution, if enabled, bot will also include all CVE's for which no score exists yet, so we don't
+# miss a hot new CVE that just doesn't yet have a score assigned.
 #     True:         enabled
 #     threshold:    all CVE's with CVSS score equal to or higher are included
 INCLUDE_HIGH_SEVERITY: True
@@ -22,7 +23,7 @@ HIGH_SEVERITY_THRESHOLD: 9.5
 # Enable including only matched keywords if CVE is also a high CVSS score (reduce noise of low-severity CVE's)
 # Disclaimer: If enabled, this means you will not see CVE's for which the CVSS score is currently blank
 ENABLE_SCORE_FILTERING: True
-MIN_SCORE_THRESHOLD: 6.0
+MIN_SCORE_THRESHOLD: 7.0
 
 # -- MITRE Exploit-DB -- Update dataset every 'n' days
 MITRE_INTERVAL: 3

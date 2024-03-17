@@ -3,7 +3,6 @@ from datetime import datetime
 
 
 
-
 def clean_multiline_string(input_string: str) -> str:
     """
     General text helper for universal use.
@@ -47,6 +46,7 @@ def convert_string_to_datetime(raw_string):
         "%Y-%m-%dT%H:%M:%S+00:00",
         "%Y-%m-%dT%I:%M:%S+00:00",
         "%Y-%m-%dT%I:%M:%S.%f",
+        "%Y-%m-%dT%I:%M:%SZ",
         # "%m/%d/%Y",
     ]
 
@@ -67,7 +67,8 @@ def convert_string_to_datetime(raw_string):
         if not found:
             # log.warn(f"Did not find correct datetime pattern from this string: {raw_string=}")
             # Try this method as fallback
-            date_obj = datetime.fromisoformat(raw_string)
+            # date_obj = datetime.fromisoformat(raw_string)
+            pass
         break
 
     # date_obj = datetime.strptime(raw_string, input_date_format)
