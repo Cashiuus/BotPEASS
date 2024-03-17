@@ -37,6 +37,8 @@ ENABLE_EPSS_LOOKUPS: True
 EXCLUDED_KEYWORDS:
 - SourceCodester
 - Sourcecodester
+- Reservation System 1.0
+- Reservation-System 1.0
 
 # Case-insensitive keywords in CVE Description/Summary
 DESCRIPTION_KEYWORDS_I:
@@ -67,6 +69,7 @@ DESCRIPTION_KEYWORDS:
 PRODUCT_KEYWORDS_I:
 - kubernetes
 - Microsoft O365
+- web application
 
 PRODUCT_KEYWORDS:
 - " AEM "
@@ -94,6 +97,7 @@ PRODUCT_KEYWORDS:
 - Python Flask
 - Spring Boot
 - Spring Core
+- Spring Framework
 - Spring Security
 - SwaggerUI
 - Symantec Endpoint
