@@ -39,6 +39,8 @@ EXCLUDED_KEYWORDS:
 - Sourcecodester
 - Reservation System 1.0
 - Reservation-System 1.0
+- WooCommerce
+- Management System 1.0
 
 # Case-insensitive keywords in CVE Description/Summary
 DESCRIPTION_KEYWORDS_I:
