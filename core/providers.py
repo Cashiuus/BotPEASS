@@ -316,20 +316,20 @@ class CVERetrieverNVD(object):
 
             # Before anything, skip excluded patterns first
             if self._is_excluded_keyword_present(item['Description']):
-                print(f"[INFO] Filtering out CVE (matches an excluded keyword): {item['CVE_ID']} - {item['Description']}")
+                if DEBUG: print(f"[INFO] Filtering out CVE (matches an excluded keyword): {item['CVE_ID']} - {item['Description']}")
                 continue
 
             if self.search_scope == 'products':
                 if self._is_prod_keyword_present(item['Description']):
                     filtered_cves.append(item)
                 else:
-                    print(f"[INFO] Filtering out CVE (no matching product keywords): {item['CVE_ID']} - {item['Description']}")
+                    if DEBUG: print(f"[INFO] Filtering out CVE (no matching product keywords): {item['CVE_ID']} - {item['Description']}")
             elif self.search_scope == 'all_keywords':
                 if self._is_prod_keyword_present(item['Description']) or \
                     self._is_summ_keyword_present(item['Description']):
                     filtered_cves.append(item)
                 else:
-                    print(f"[INFO] Filtering out CVE (no matching general keywords): {item['CVE_ID']} - {item['Description']}")
+                    if DEBUG: print(f"[INFO] Filtering out CVE (no matching general keywords): {item['CVE_ID']} - {item['Description']}")
             elif self.search_scope == 'all_cves':
                 return self.cve_new_dataset
 
@@ -341,7 +341,7 @@ class CVERetrieverNVD(object):
                     else:
                         if DEBUG: print(f"[DBG] Skipping {item['CVE_ID']} because it's already in the results list")
                 else:
-                    print(f"[INFO] Filtering out CVE (no match on preferences and not a high enough severity score): {item['CVE_ID']} - {item['Description']}")
+                    if DEBUG: print(f"[INFO] Filtering out CVE (no match on preferences and not a high enough severity score): {item['CVE_ID']} - {item['Description']}")
 
         self.cve_new_dataset = filtered_cves
         return

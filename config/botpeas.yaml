@@ -41,6 +41,11 @@ EXCLUDED_KEYWORDS:
 - Reservation-System 1.0
 - WooCommerce
 - Management System 1.0
+- Ordering System 1.0
+- PHPGurukul
+- Campcodes
+- code-projects
+- WP Roadmap
 
 # Case-insensitive keywords in CVE Description/Summary
 DESCRIPTION_KEYWORDS_I:
