@@ -128,7 +128,7 @@ class CVERetrieverNVD(object):
         print("[*] Loaded config settings, search & exclusion keywords")
 
         # Load MITRE Exploit-DB Mapping Data
-        self.download_exploit_mapping()
+        # self.download_exploit_mapping()
         self.exploit_map = []
         fieldnames = ["ExploitId", "CveId"]     # The original headers of the MITRE Exploit map file
         with open(self.mitre_exploit_file, 'r') as mitre_file:
@@ -397,6 +397,8 @@ class CVERetrieverNVD(object):
 
     def download_exploit_mapping(self):
         """ Retrieve the current MITRE Exploit-DB mapping dataset to use locally. """
+
+        # MITRE doesn't maintain this dataset anymore, so no sense getting new
         date_threshold = datetime.datetime.now() - datetime.timedelta(days=int(self.mitre_interval))
         if os.path.exists(self.mitre_exploit_file):
             if self.last_mitre_retrieval < date_threshold:
@@ -404,7 +406,8 @@ class CVERetrieverNVD(object):
             else:
                 if DEBUG: print("[DBG] Last MITRE data retrieval is fresh and will be used")
                 return
-        url_mitre = "https://cve.mitre.org/data/refs/refmap/source-EXPLOIT-DB.html"
+        # url_mitre = "https://cve.mitre.org/data/refs/refmap/source-EXPLOIT-DB.html"
+        url_mitre = "https://www.cve.org/Resources/Media/Archives/OldWebsite/data/refs/refmap/source-EXPLOIT-DB.html"
         response = requests.get(url_mitre, allow_redirects=True)
 
         if response.status_code == 200:
