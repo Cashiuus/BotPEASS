@@ -301,14 +301,17 @@ class CVERetrieverNVD(object):
         self.update_cve_settings_file()
         return self.cve_new_dataset
 
+
     def filter_cves(self):
         filtered_cves = []
         for item in self.cve_new_dataset:
             # Which method(s) are we filtering by
             if self.enable_score_filtering:
                 if not item.get('CVSSv3_Score'):
-                    # Score filtering is enabled, but this one doesn't have a score, err on side of caution and include it in results
-                    item['CVSSv3_Score'] = "TBD"
+                    # Score filtering is enabled, but this one doesn't have a score
+                    # item['CVSSv3_Score'] = "TBD"
+                    print("[INFO] Skipping CVE with no CVSS Score; too noisy")
+                    continue
                 elif not self._cvss_score_at_above(item['CVE_ID'], item['CVSSv3_Score'], self.min_score_threshold):
                     # If score filtering is enabled, and CVE is below threshold, skip it altogether
                     print(f"[INFO] Filtering out CVE (below min score threshold): {item['CVE_ID']} - {item['Description']}")
@@ -346,6 +349,7 @@ class CVERetrieverNVD(object):
         self.cve_new_dataset = filtered_cves
         return
 
+
     def _cvss_score_at_above(self, cve, cvss_score: float, threshold: float):
         val = False
         if not cvss_score:
@@ -357,19 +361,23 @@ class CVERetrieverNVD(object):
             if DEBUG: print("[DBG] ValueError evaluating CVSS Score to threshold, CVSS Score is: {}".format(cvss_score))
         return val
 
+
     def _is_summ_keyword_present(self, summary: str):
         """ Given the summary check if any keyword is present """
         return any(w in summary for w in self.description_keywords) or \
             any(w.lower() in summary.lower() for w in self.description_keywords_i)
+
 
     def _is_prod_keyword_present(self, products: str):
         """ Given the summary check if any keyword is present """
         return any(w in products for w in self.product_keywords) or \
             any(w.lower() in products.lower() for w in self.product_keywords_i)
 
+
     def _is_excluded_keyword_present(self, summary: str):
         """ return True if an excluded keyword is in the summary/description. """
         return any(w in summary for w in self.excluded_keywords)
+
 
     def check_cve_has_exploit(self):
         """ Search CVE's from our results to the exploit mapping to see if an Exploit-DB ID is listed. If so, add this to the dataset. """
@@ -385,6 +393,7 @@ class CVERetrieverNVD(object):
                         # TODO: Would a CVE have more than one exploit id mapping in this file?
                         item['ExploitDB_ID'] = node['ExploitDB_ID']
         return
+
 
     def download_exploit_mapping(self):
         """ Retrieve the current MITRE Exploit-DB mapping dataset to use locally. """
@@ -408,8 +417,11 @@ class CVERetrieverNVD(object):
             return
         # Parse the html and extract the tables we need
         soup = BS(response.text, "html.parser")
-        table = soup.find_all("table", attrs={"cellpadding": "2", "cellspacing": "2", "border": "2"})[1]
-
+        try:
+            table = soup.find_all("table", attrs={"cellpadding": "2", "cellspacing": "2", "border": "2"})[1]
+        except IndexError as e:
+            print("[!] Invalid soup query, table is empty. Skipping parsing of the online resource")
+            return
         headings = ["ExploitId", "CveId"]
         datasets = []
         for row in table.find_all("tr")[0:]:
@@ -437,9 +449,11 @@ class CVERetrieverNVD(object):
         self.last_mitre_retrieval = now.strftime(self.time_format)
         return
 
+
     def get_github_exclusions_addendum(self):
         """ From the config, send over the URL-formatted query addendum to tune all built URLs. """
         return self.gitdork_excluded_repos_string
+
 
 # NVD API Notes:
     # E.g. requests.get("https://services.nvd.nist.gov/rest/json/cves/2.0?hasKev", headers=headers)

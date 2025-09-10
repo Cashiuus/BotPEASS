@@ -1,7 +1,12 @@
-
+"""
+Helper utilities to query Github API and organize
+metadata of repo count, stars, etc, related to a
+partificular keyword search, such as a CVE.
+"""
 import json
 import operator
 from dataclasses import dataclass
+from time import sleep
 
 import requests
 
@@ -23,14 +28,18 @@ class Repository():
 
 
 
-def search_github(cve):
+def search_github(cve, throttle=False):
     url = f"https://api.github.com/search/repositories?q={cve}"
 
+    if throttle:
+        sleep(3)
+
+    sleep(0.5)
     response = requests.get(url)
 
     if response.status_code != 200:
-        print(f"[ERR] Response not 200, failed search for CVE: {cve}")
-        return
+        print(f"[!] Response not 200, failed search for CVE: {cve} | Response code: {response.status_code}")
+        return 403
 
     data = json.loads(response.text)
     # log.debug(f"Response data keys: {data.keys()}")

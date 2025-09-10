@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from time import sleep
 
 import requests
 
@@ -20,6 +21,9 @@ def main():
                         help='Run bot in console for testing, skipping writes to file')
     args = parser.parse_args()
 
+    enable_github_search = True
+    throttle_github_search = False
+
     retriever = CVERetrieverNVD(testing=args.testing)
     data = retriever.get_new_cves()
     github_query_addendum = retriever.gitdork_excluded_repos_string
@@ -29,10 +33,18 @@ def main():
             # item is dict with keys: CVE_ID, CVSSv3_Score, Published, Description, ExploitDB_ID
             #  Exploit_References, Normal_References
 
-            github_poc_count = search_github(item['CVE_ID'])
-            if github_poc_count:
-                github_poc_count = len(github_poc_count)
-
+            if enable_github_search:
+                github_poc_count = search_github(item['CVE_ID'], throttle=throttle_github_search)
+                if github_poc_count:
+                    # Custom return value to indicate GitHub has throttled us
+                    if github_poc_count == 403:
+                        enable_github_search = False
+                        print("[!] Github API Search is blocking, disabling it for this run")
+                        # throttle_github_search = True
+                    else:
+                        github_poc_count = len(github_poc_count)
+            else:
+                github_poc_count = 0
             cve_message = generate_new_cve_message(item, github_addendum=github_query_addendum, github_poc_count=github_poc_count)
             # public_exploits = ''
             if item.get('ExploitDB_ID') is not None:
