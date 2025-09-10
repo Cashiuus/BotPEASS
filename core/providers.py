@@ -405,9 +405,6 @@ class CVERetrieverNVD(object):
                 if DEBUG: print("[DBG] Last MITRE data retrieval is fresh and will be used")
                 return
         url_mitre = "https://cve.mitre.org/data/refs/refmap/source-EXPLOIT-DB.html"
-        csv_file = open(self.mitre_exploit_file, 'w')
-        csv_writer = csv.writer(csv_file)
-
         response = requests.get(url_mitre, allow_redirects=True)
 
         if response.status_code == 200:
@@ -415,6 +412,7 @@ class CVERetrieverNVD(object):
         else:
             print(f"[!] Could not connect to retrieve MITRE Exploit mapping resource file, try again later")
             return
+
         # Parse the html and extract the tables we need
         soup = BS(response.text, "html.parser")
         try:
@@ -437,6 +435,9 @@ class CVERetrieverNVD(object):
         df[headings[1]] = df[headings[1]].str.lstrip(' ') # removing the leading white space from the CVEId column
         df[headings[1]] = df[headings[1]].str.split(' ') # splitting the column based on white space within the entries
         df = df.set_index([headings[0]])[headings[1]].apply(pd.Series).stack().reset_index().drop('level_1',axis = 1).rename(columns = {0: headings[1]}) # creating multiple rows for exploits that correspond to multiple CVE #'s
+
+        csv_file = open(self.mitre_exploit_file, 'w')
+        csv_writer = csv.writer(csv_file)
 
         n = len(df[headings[1]])
         csv_writer.writerow(headings)
