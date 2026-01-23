@@ -120,11 +120,6 @@ def generate_new_cve_message(cve_data: dict, github_addendum: str = None, github
         message += f"😈  *Exploit-DB*: <https://www.exploit-db.com/exploits/{cve_data['ExploitDB_ID']}|EDB {cve_data['ExploitDB_ID']} Link>\n"
 
     # -- Rest of Message, regardless --
-    # message += f"  *Published*: {datetime.datetime.strptime(cve_data['Published'], friendly_time)}"
-    message += f"📅  *Published*: {convert_string_to_datetime(cve_data['Published']):%Y-%m-%d}"
-    # message += f" - *Modified*: {datetime.datetime.strptime(cve_data['Last_Modified'], friendly_time)}\n"
-    message += f" - *Modified*: {convert_string_to_datetime(cve_data['Last_Modified']):%Y-%m-%d}\n"
-
     message += "📓  *Description*: "
     message += cve_data["Description"] if len(cve_data["Description"]) < 400 else cve_data["Description"][:400] + "..."
     message += "\n"
@@ -140,6 +135,11 @@ def generate_new_cve_message(cve_data: dict, github_addendum: str = None, github
         message += f"  :fire:  POC's: {github_poc_count})\n"
     else:
         message += "\n"
+
+    # message += f"  *Published*: {datetime.datetime.strptime(cve_data['Published'], friendly_time)}"
+    message += f"📅  *Published*: {convert_string_to_datetime(cve_data['Published']):%Y-%m-%d}"
+    # message += f" - *Modified*: {datetime.datetime.strptime(cve_data['Last_Modified'], friendly_time)}\n"
+    message += f" - *Modified*: {convert_string_to_datetime(cve_data['Last_Modified']):%Y-%m-%d}\n"
 
     message += "ℹ️   *More information* (_limit 5_):\n" + "\n".join(cve_data["Normal_References"][:5])
 
